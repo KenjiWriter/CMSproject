@@ -21,9 +21,9 @@
 				
 				$query->execute(); 
                 
-                $target = "images/".basename($image);
+                $target = "uploads/".basename($image);
                 
-                if(move_uploaded_file($_FILES['name']['tmp_name'],$target)){
+                if (move_uploaded_file($_FILES['photo']['tmp_name'], "uploads/$image")) {
                 } else {
                     $error = "There was a problem uploading image";
                 }
