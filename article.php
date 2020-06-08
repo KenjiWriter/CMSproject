@@ -32,15 +32,14 @@
 
         <p><?php echo $data['article_content']; ?></p>
 
+        <?php
+        if (empty($data['article_image'])){
+            echo "";
+        } else {
+        echo "<img src='admin/uploads/".$data['article_image']."'> <br> <br>";
+        }
+        ?>
 
-        <img src='uploads/' <?php.$data['article_image']?> </img>
-
-
-
-
-
-
-        <br> <br>
         <a href="index.php">&larr; Back</a>
     </div>
 
