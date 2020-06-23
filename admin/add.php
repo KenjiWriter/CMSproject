@@ -27,9 +27,6 @@
 				$query-> bindValue(3, time());
                 $query->execute();
                 header('Location: index.php');
-               } else {
-                   
-               
                 } else {
                         if (file_exists($target_file)) {
                             $error = 'File already exist!';
@@ -96,10 +93,3 @@
 </body>
 
 </html>
-
-<?php
-	} else {
-		header('Location: Index.php');
-	}
-
-?>
