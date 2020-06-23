@@ -8,28 +8,53 @@
 		if (isset($_POST['title'], $_POST['content'])){
 			$title = $_POST['title'];
 			$content = nl2br($_POST['content']);
-            $image = $_FILES['photo']['name'];
+            $image = $_FILES['image']['name'];
+            $file = $_POST['image'];
+            $target_dir = "../images/";
+            $target_file = $target_dir . basename($_FILES["image"]["name"]);
+            $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
 			
-			if (empty($title) or empty($content)) {
+			
+            
+            if (empty($title) or empty($content)) {
 				$error = 'All fields are required!';
 			} else {
-				$query = $pdo-> prepare('INSERT INTO articles (article_title, article_content, article_timestamp, article_image) VALUES (?, ?, ?, ?)');
+                
+               if(empty($image)) {
+                $query = $pdo-> prepare('INSERT INTO articles (article_title, article_content, article_timestamp) VALUES (?, ?, ?)');
 				$query-> bindValue(1, $title);
 				$query-> bindValue(2, $content);
 				$query-> bindValue(3, time());
-				$query-> bindValue(4, $image);
-				
-				$query->execute(); 
-                
-                $target = "uploads/".basename($image);
-                
-                if (move_uploaded_file($_FILES['photo']['tmp_name'], "uploads/$image")) {
+                $query->execute();
+                header('Location: index.php');
+               } else {
+                   
+               
                 } else {
-                    $error = "There was a problem uploading image";
+                        if (file_exists($target_file)) {
+                            $error = 'File already exist!';
+                        }else {
+                            if ($_FILES["file"]["size"] > 10000) {
+                            $error = 'The maximum file size is 5MB!';
+                        }else{
+                            if(!in_array($imageFileType,array("jpg","png","jpeg","gif"))) {
+                            $error = 'Allowed file extensions are: jpg, png, jpeg, gif!';
+                            } else{
+                            if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) 
+                            $query = $pdo-> prepare('INSERT INTO articles (article_title, article_content, article_timestamp, article_image) VALUES (?, ?, ?, ?)');
+                            $query-> bindValue(1, $title);
+                            $query-> bindValue(2, $content);
+                            $query-> bindValue(3, time());
+                            $query-> bindValue(4, $image);
+                            $query->execute();
+                            header('Location: index.php'); 
+                            }
+                                
+                            }
+                        }
+                    }
                 }
-                
-                header('Location: Index.php');
-			}
+            }
 		}
 		
 		
@@ -55,13 +80,13 @@
 
         <h4> Add Article </h4>
         <?php if (isset($error)) { ?>
-        <small style="color:#aa0000;"><?php echo $error ?></small> <br /> <br />
+        <small style="color:#aa0000;"><?php echo $error ?></small>
         <?php } ?>
         <form action="add.php" method="post" enctype="multipart/form-data">
             <input type="text" name="title" placeholder="Article title..." /><br /> <br />
             <textarea rows="10" cols="60" name="content" placeholder="Article content..."></textarea><br> <br>
             Select image to upload:
-            <input type="file" name="photo" id="photo"> <br> <br>
+            <input type="file" name="image" id="image"> <br> <br>
             <input type="submit" value="Add article" name="submit" />
         </form>
 
