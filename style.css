@@ -1,12 +1,13 @@
 body {
     padding-top: 120px;
     font-family: Arial;
-	background-color: #ccffcc;
+    background-color: #ccffcc;
 }
 
 .container {
     width: 500px;
     margin: 0 auto;
+    widows: 50%;
 }
 
 a:link,
@@ -18,30 +19,36 @@ a:visited {
 
 a:hover {
     color: #444;
-    border-bottom-color: #444; 
+    border-bottom-color: #444;
 }
 
 small {
-	color: #999;
-	font-style: italic;
+    color: #999;
+    font-style: italic;
 }
 
 p {
-	line-height: 30px;
+    line-height: 30px;
 }
 
 ol li {
-	line-height: 30px;
+    line-height: 30px;
 }
 
-input[type=text], input[type=password], textarea {
-	-webkit-appearance: none;
-	padding: 5px;
-	border: 1px solid #ccc;
+input[type=text],
+input[type=password],
+textarea {
+    -webkit-appearance: none;
+    padding: 5px;
+    border: 1px solid #ccc;
 }
 
-input[type=text]:focus, input[type=password]:focus, textarea:focus {
-	outline: none;
+input[type=text]:focus,
+input[type=password]:focus,
+textarea:focus {
+    outline: none;
 }
 
-
+.img {
+    width: 300px;
+}

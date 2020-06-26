@@ -5,6 +5,7 @@
 	
 	$article = new Article;
 
+
 	if (isset($_GET['id'])) {
 		
 		$id = $_GET['id'];
@@ -36,7 +37,7 @@
         if (empty($data['article_image'])){
             echo "";
         } else {
-        echo "<img src='admin/uploads/".$data['article_image']."'> <br> <br>";
+        echo "<img class='img' src='images/".$data['article_image']."'> <br> <br>";
         }
         ?>
 

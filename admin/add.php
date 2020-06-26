@@ -1,7 +1,6 @@
 <?php 
 
 	session_start();
-	
 	include_once('../includes/connection.php');
 	
 	if( isset($_SESSION['logged_in'])){
@@ -9,50 +8,67 @@
 			$title = $_POST['title'];
 			$content = nl2br($_POST['content']);
             $image = $_FILES['image']['name'];
-            $file = $_POST['image'];
-            $target_dir = "../images/";
-            $target_file = $target_dir . basename($_FILES["image"]["name"]);
-            $imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+            $target = "../images/";
+            $target_dir = $target . basename($_FILES["image"]["name"]);
+            $imageFileType = pathinfo($target_dir, PATHINFO_EXTENSION);
+            $valid_ext = array('PNG','jpeg','jpg','gif','png','JPEG','JPG','GIF');
+            $file_size = $_FILES["image"]["size"];
+            $imageTemp = $_FILES["image"]["tmp_name"];
 			
-			
-            
-            if (empty($title) or empty($content)) {
+			if (empty($title) or empty($content)) {
 				$error = 'All fields are required!';
 			} else {
-                
-               if(empty($image)) {
-                $query = $pdo-> prepare('INSERT INTO articles (article_title, article_content, article_timestamp) VALUES (?, ?, ?)');
-				$query-> bindValue(1, $title);
-				$query-> bindValue(2, $content);
-				$query-> bindValue(3, time());
-                $query->execute();
-                header('Location: index.php');
+                if(empty($image)){
+                    $query = $pdo-> prepare('INSERT INTO articles (article_title, article_content, article_timestamp) VALUES (?, ?, ?)');
+                    $query-> bindValue(1, $title);
+                    $query-> bindValue(2, $content);
+                    $query-> bindValue(3, time());
+                    $query->execute();
+
+                    header('Location: ../index.php');
                 } else {
-                        if (file_exists($target_file)) {
-                            $error = 'File already exist!';
-                        }else {
-                            if ($_FILES["file"]["size"] > 10000) {
-                            $error = 'The maximum file size is 5MB!';
-                        }else{
-                            if(!in_array($imageFileType,array("jpg","png","jpeg","gif"))) {
-                            $error = 'Allowed file extensions are: jpg, png, jpeg, gif!';
-                            } else{
-                            if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) 
-                            $query = $pdo-> prepare('INSERT INTO articles (article_title, article_content, article_timestamp, article_image) VALUES (?, ?, ?, ?)');
-                            $query-> bindValue(1, $title);
-                            $query-> bindValue(2, $content);
-                            $query-> bindValue(3, time());
-                            $query-> bindValue(4, $image);
-                            $query->execute();
-                            header('Location: index.php'); 
-                            }
+                    function compress($source, $destination, $quality){
+                        $imgInfo = getimagesize($source);
+                        $mime = $imgInfo['mime'];
+                        
+                        switch($mime){
+                                case 'image/jpeg';
+                                    $image = imagecreatefromjpeg($source);
+                                    break;                      
+                                case 'image/png';
+                                    $image = imagecreatefrompng($source);
+                                    break;                            
+                                case 'image/gif';
+                                    $image = imagecreatefromgif($source);
+                                    break;
+                            default:
+                                    $image = imagecreatefromjpeg($source);
+
                                 
-                            }
                         }
+                        imagejpeg($image, $destination, $quality);
+                            
+                        return $destination;   
+                    }
+                    if(in_array($imageFileType, $valid_ext)){
+                        $compressedImage = compress($imageTemp, $target_dir, 50);
+                        
+                    if($compressedImage){
+                        $compressedImageSize = filesize($compressedImage);
+                        $query = $pdo-> prepare('INSERT INTO articles (article_title, article_content, article_timestamp, article_image) VALUES (?, ?, ?, ?)');
+                        $query-> bindValue(1, $title);
+                        $query-> bindValue(2, $content);
+                        $query-> bindValue(3, time());
+                        $query-> bindValue(4, $image);
+                        $query->execute();
+                        header('Location: ../index.php');
+                        }
+                    }else {
+                        $error = 'Sorry, this file extension is not allowed. Plase use: png, jpeg, jpg or gif!';
                     }
                 }
             }
-		}
+        }
 		
 		
 		
@@ -77,7 +93,7 @@
 
         <h4> Add Article </h4>
         <?php if (isset($error)) { ?>
-        <small style="color:#aa0000;"><?php echo $error ?></small>
+        <b><small style="color:#aa0000;"><?php echo $error ?></small></b><br><br>
         <?php } ?>
         <form action="add.php" method="post" enctype="multipart/form-data">
             <input type="text" name="title" placeholder="Article title..." /><br /> <br />
@@ -93,3 +109,9 @@
 </body>
 
 </html>
+<?php
+	} else {
+		header('Location: Index.php');
+	}
+
+?>
